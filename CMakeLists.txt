@@ -3,6 +3,8 @@ project(libobs_node)
 
 set(CMAKE_CXX_STANDARD 14)
 
+add_definitions(-DNAPI_VERSION=3)
+
 ## Detect Libary Suffix
 #IF(WIN32)
 #    SET(libExtension ".dll")
