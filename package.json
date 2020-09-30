@@ -1,15 +1,15 @@
 {
   "name": "libobs-node",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "repository": {
     "type": "git",
     "url": "https://github.com/Mengli619/libobs-node.git"
   },
   "main": "index.js",
   "scripts": {
-    "install": "prebuild-install --runtime napi",
+    "install": "prebuild-install --runtime napi --debug --verbose",
     "rebuild": "prebuild --compile --backend cmake-js",
-    "prebuild": "prebuild --runtime napi ---all --strip --verbose --backend cmake-js",
+    "prebuild": "prebuild --runtime napi ---all --strip --verbose --backend cmake-js -- --prefer-clang --CDOBS_STUDIO_DIR=${OBS_STUDIO_DIR}",
     "upload": "prebuild --runtime napi --backend cmake-js --upload ${GITHUB_TOKEN}"
   },
   "dependencies": {
