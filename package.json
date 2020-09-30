@@ -7,7 +7,7 @@
   },
   "main": "index.js",
   "scripts": {
-    "install": "prebuild-install --runtime napi --debug --verbose",
+    "install": "prebuild-install --runtime napi --force",
     "rebuild": "prebuild --compile --backend cmake-js",
     "prebuild": "prebuild --runtime napi ---all --strip --verbose --backend cmake-js -- --prefer-clang --CDOBS_STUDIO_DIR=${OBS_STUDIO_DIR}",
     "upload": "prebuild --runtime napi --backend cmake-js --upload ${GITHUB_TOKEN}"
