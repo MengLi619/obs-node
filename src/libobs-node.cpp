@@ -7,6 +7,8 @@ static Napi::Boolean Initialize(const Napi::CallbackInfo& info) {
     return Napi::Boolean::New(env, true);
 }
 
+
+
 static Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "initialize"), Napi::Function::New(env, Initialize));
     return exports;
