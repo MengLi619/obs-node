@@ -1,12 +1,16 @@
 {
   "name": "libobs-node",
   "version": "1.0.0",
-  "repository": "https://github.com/MengLi619/libobs-node",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mengli619/libobs-node.git"
+  },
   "main": "index.js",
   "scripts": {
-    "install": "prebuild --install --backend cmake-js",
+    "install": "prebuild-install --runtime napi",
     "rebuild": "prebuild --compile --backend cmake-js",
-    "prebuild": "prebuild --all --strip --verbose --backend cmake-js"
+    "prebuild": "prebuild --runtime napi ---all --strip --verbose --backend cmake-js",
+    "upload": "prebuild --runtime napi --backend cmake-js --upload ${GITHUB_TOKEN}"
   },
   "dependencies": {
     "bindings": "^1.5.0",
@@ -18,5 +22,8 @@
     "cmake-js": "^6.1.0",
     "prebuild": "^10.0.1",
     "typescript": "^4.0.3"
+  },
+  "binary": {
+    "napi_versions": [2, 3]
   }
 }

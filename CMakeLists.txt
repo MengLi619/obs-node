@@ -3,7 +3,7 @@ project(libobs_node)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_definitions(-DNAPI_VERSION=3)
+add_compile_definitions(NAPI_VERSION=${napi_build_version})
 
 ## Detect Libary Suffix
 #IF(WIN32)
