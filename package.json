@@ -8,12 +8,12 @@
   "dependencies": {
     "bindings": "^1.5.0",
     "node-addon-api": "^3.0.2",
-    "node-pre-gyp": "^0.15.0"
+    "node-pre-gyp": "^0.15.0",
+    "prebuild-install": "^5.3.5"
   },
   "devDependencies": {
     "cmake-js": "^6.1.0",
     "prebuild": "^10.0.1",
-    "prebuild-install": "^5.3.5",
     "typescript": "^4.0.3"
   }
 }
