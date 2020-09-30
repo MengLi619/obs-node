@@ -13,6 +13,7 @@
   "devDependencies": {
     "cmake-js": "^6.1.0",
     "prebuild": "^10.0.1",
+    "prebuild-install": "^5.3.5",
     "typescript": "^4.0.3"
   }
 }
