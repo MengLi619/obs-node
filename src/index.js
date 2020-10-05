@@ -1,1 +1,0 @@
-module.exports = require('./build/Release/libobs_node.node');
