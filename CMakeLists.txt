@@ -4,11 +4,11 @@ project(libobs_node)
 set(CMAKE_CXX_STANDARD 14)
 
 # Variables
-message(STATUS "'OBS_STUDIO_DIR' = ${OBS_STUDIO_DIR}")
 if (NOT OBS_STUDIO_DIR)
-    message(FATAL_ERROR "'OBS_STUDIO_DIR' is not set")
-    return()
+    set(OBS_STUDIO_DIR libobs/dist)
 endif()
+
+message(STATUS "'OBS_STUDIO_DIR' = ${OBS_STUDIO_DIR}")
 
 # Currently not only Apple is supported, other platform will add soon.
 IF(NOT APPLE)
@@ -17,9 +17,7 @@ IF(NOT APPLE)
 ENDIF()
 
 # Build
-set(CMAKE_INSTALL_PREFIX ${CMAKE_CURRENT_BINARY_DIR}/dist/)
-
-file(GLOB SOURCE_FILES "src/*.cpp" "src/*.h")
+file(GLOB SOURCE_FILES "src/addon/*.cpp" "src/addon/*.h")
 add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES} ${CMAKE_JS_SRC})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "" SUFFIX ".node")

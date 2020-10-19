@@ -1,3 +1,3 @@
-const obs = require('../build/dist/libobs_node.node');
+const obs = require('../prebuild/libobs_node.node');
 
 export = obs;

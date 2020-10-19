@@ -1,3 +1,3 @@
 import * as obs from '../src';
 
-console.log(obs.initialize());
+console.log(obs.startup());

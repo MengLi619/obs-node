@@ -4,18 +4,20 @@
   "repository": "https://github.com/Mengli619/libobs-node.git",
   "main": "index.js",
   "scripts": {
-    "prepare": "tsc --declaration && cp dist/* .",
-    "install": "node download.js"
+    "prepare": "rm -rf dist && tsc --declaration && node dist/scripts/download.js"
   },
   "dependencies": {
+    "axios": "^0.20.0",
     "bindings": "^1.5.0",
-    "node-addon-api": "^3.0.2"
+    "node-addon-api": "^3.0.2",
+    "tar-fs": "^2.1.0"
   },
   "devDependencies": {
+    "@types/axios": "^0.14.0",
     "@types/node": "^14.11.2",
     "cmake-js": "^6.1.0",
     "ghreleases": "^3.0.2",
-    "tar": "^6.0.5",
+    "github-from-package": "0.0.0",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.3"
   }
