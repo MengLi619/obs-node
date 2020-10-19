@@ -4,7 +4,7 @@
   "repository": "https://github.com/Mengli619/libobs-node.git",
   "main": "index.js",
   "scripts": {
-    "install": "rm -rf dist && tsc --declaration && node dist/scripts/download.js"
+    "postinstall": "rm -rf dist && tsc --declaration && node dist/scripts/download.js"
   },
   "dependencies": {
     "axios": "^0.20.0",
