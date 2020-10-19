@@ -41,10 +41,10 @@ const downloadFolder = path.resolve(__dirname, '../../');
 const tarFile = path.join(downloadFolder, fileName);
 const untarFolder = path.join(downloadFolder, 'prebuild');
 
-// if (!(packageJson as any)._from) {
-//     console.log(`Local install, skip download prebuild.`);
-//     process.exit(0);
-// }
+if (!(packageJson as any)._from) {
+    console.log(`Local install, skip download.`);
+    process.exit(0);
+}
 
 if (fs.existsSync(untarFolder)) {
     console.log(`Prebuild folder is already existed, skip download.`);
