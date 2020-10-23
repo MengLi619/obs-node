@@ -1,6 +1,5 @@
 node_modules/
 build/
-libobs/
 dist/
 prebuild/
 .idea/
