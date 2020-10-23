@@ -65,6 +65,8 @@ if [[ $BUILD_TYPE == 'all' || $BUILD_TYPE == 'obs-studio' ]]; then
     rm -rf "${OBS_INSTALL_PREFIX}"
     cmake -DCMAKE_INSTALL_PREFIX="${OBS_INSTALL_PREFIX}" \
           -DUNIX_STRUCTURE=0 \
+          -DDISABLE_UI=TRUE \
+          -DDISABLE_PYTHON=ON \
           -DCMAKE_BUILD_TYPE="${RELEASE_TYPE}" \
           ..
     cmake --build . --target install -- -j 4
@@ -75,7 +77,7 @@ if [[ $BUILD_TYPE == 'all' || $BUILD_TYPE == 'obs-studio' ]]; then
   popd
 
   # Copy obs files to prebuild
-  mkdir -p "${PREBUILD_DIR}/obs-studio"
+  rm -rf "${PREBUILD_DIR}/obs-studio" && mkdir -p "${PREBUILD_DIR}/obs-studio"
   if [[ "$OSTYPE" == "darwin"* ]]; then
     cp -r "${OBS_INSTALL_PREFIX}"/{bin,data,obs-plugins} "${PREBUILD_DIR}/obs-studio"
   elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
@@ -104,7 +106,6 @@ if [[ $BUILD_TYPE == 'all' || $BUILD_TYPE == 'obs-node' ]]; then
   if [[ ! -d "$BASE_DIR/node_modules/" ]]; then
     npm ci
   fi
-  rm -rf "${BUILD_DIR:?}/${RELEASE_TYPE:?}"
   node node_modules/.bin/cmake-js configure \
     "$([[ $RELEASE_TYPE == 'Debug' ]] && echo '-D')" \
     --CDOBS_STUDIO_DIR="${OBS_INSTALL_PREFIX}"

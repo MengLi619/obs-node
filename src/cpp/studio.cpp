@@ -47,7 +47,7 @@ void Studio::startup() {
         obs_video_info ovi = {};
         memset(&ovi, 0, sizeof(ovi));
         ovi.adapter = 0;
-        ovi.graphics_module = "libobs-opengl.so";
+        ovi.graphics_module = (getObsBinPath() + "/libobs-opengl.so").c_str();
         ovi.output_format = VIDEO_FORMAT_NV12;
         ovi.fps_num = settings->video_fps_num;
         ovi.fps_den = settings->video_fps_den;
