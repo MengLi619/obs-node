@@ -25,7 +25,8 @@ jobs:
         shell: bash
 
   build-linux:
-    runs-on: ubuntu-latest
+    container:
+      image: 'ubuntu:20.04'
     steps:
       - name: Checkout
         uses: actions/checkout@v2
