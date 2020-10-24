@@ -1,7 +1,7 @@
 {
-  "name": "libobs-node",
+  "name": "obs-node",
   "version": "1.0.2",
-  "repository": "https://github.com/Mengli619/libobs-node.git",
+  "repository": "https://github.com/Mengli619/obs-node.git",
   "main": "dist/index.js",
   "scripts": {
     "postinstall": "rm -rf dist && tsc --declaration && node dist/scripts/download.js",
