@@ -23,6 +23,7 @@ if [[ $RELEASE_TYPE != 'Release' && $RELEASE_TYPE != 'Debug' ]]; then
   exit 1
 fi
 
+mkdir -p "${BUILD_DIR}" "${PREBUILD_DIR}"
 if [[ $BUILD_TYPE == 'all' || $BUILD_TYPE == 'obs-studio' ]]; then
   echo "Building obs-studio"
   # Clone obs studio
