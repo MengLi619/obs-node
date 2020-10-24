@@ -82,7 +82,7 @@ jobs:
         shell: bash
 
       - name: Build
-        run: bash scripts/build all
+        run: bash scripts/build.sh all
         shell: bash
 
       - name: Upload
