@@ -51,6 +51,8 @@ sources.forEach(s => {
     obs.addSource(s.sceneId, s.sourceId, s.sourceType, s.sourceUrl);
 });
 
+console.log(`Obs scenes: ${JSON.stringify(obs.getScenes())}`);
+
 const readLine = readline.createInterface({
     input: process.stdin,
     output: process.stdout,

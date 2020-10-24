@@ -74,6 +74,16 @@ Napi::Value switchToScene(const Napi::CallbackInfo &info) {
     return info.Env().Undefined();
 }
 
+Napi::Array getScenes(const Napi::CallbackInfo &info) {
+    auto scenes = studio->getScenes();
+    auto result = Napi::Array::New(info.Env(), scenes.size());
+    int i = 0;
+    for (auto &scene : scenes) {
+        result[i++] = scene.second->getNapiScene(info.Env());
+    }
+    return result;
+}
+
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "setObsPath"), Napi::Function::New(env, setObsPath));
     exports.Set(Napi::String::New(env, "startup"), Napi::Function::New(env, startup));
@@ -82,6 +92,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "addSource"), Napi::Function::New(env, addSource));
     exports.Set(Napi::String::New(env, "restartSource"), Napi::Function::New(env, restartSource));
     exports.Set(Napi::String::New(env, "switchToScene"), Napi::Function::New(env, switchToScene));
+    exports.Set(Napi::String::New(env, "getScenes"), Napi::Function::New(env, getScenes));
     return exports;
 }
 

@@ -13,12 +13,18 @@ class Source {
 
 public:
     Source(std::string &id, SourceType type, std::string &url, obs_scene_t *obs_scene, Settings *settings);
+
     void start();
+
     void stop();
-    bool isStarted() const { return started; }
+
     static SourceType getSourceType(const std::string &sourceType);
 
+    Napi::Object getNapiSource(const Napi::Env &env);
+
 private:
+    static std::string getSourceTypeString(SourceType sourceType);
+
     std::string id;
     SourceType type;
     std::string url;

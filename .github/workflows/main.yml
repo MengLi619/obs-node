@@ -1,0 +1,27 @@
+name: obs-node
+
+on:
+  push:
+    tags:
+      - '*'
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: bash scripts/build.sh
+        shell: bash
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: bash scripts/build.sh
+        shell: bash

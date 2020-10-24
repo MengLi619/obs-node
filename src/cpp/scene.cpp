@@ -31,3 +31,15 @@ obs_scene_t *Scene::createObsScene(std::string &sceneId) {
     }
     return scene;
 }
+
+Napi::Object Scene::getNapiScene(const Napi::Env &env) {
+    auto napiScene = Napi::Object::New(env);
+    auto napiSources = Napi::Array::New(env, sources.size());
+    int i = 0;
+    for (auto &source : sources) {
+        napiSources[i++] = source.second->getNapiSource(env);
+    }
+    napiScene.Set("id", id);
+    napiScene.Set("sources", napiSources);
+    return napiScene;
+}

@@ -12,6 +12,17 @@ declare namespace obs {
 
     export type TransitionType = 'cut_transition';
 
+    export interface Scene {
+        id: string;
+        source: Source[];
+    }
+
+    export interface Source {
+        id: string;
+        type: SourceType;
+        url: string;
+    }
+
     export interface Settings {
         server: string;
         key: string;
@@ -40,6 +51,7 @@ declare namespace obs {
         addScene(sceneId: string): string;
         addSource(sceneId: string, sourceId: string, sourceType: SourceType, sourceUrl: string): void;
         switchToScene(sceneId: string, transitionType: TransitionType, transitionMs: number): void;
+        getScenes(): Scene[];
     }
 }
 

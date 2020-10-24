@@ -15,6 +15,7 @@ public:
     void addSource(std::string &sceneId, std::string &sourceId, SourceType sourceType, std::string &sourceUrl);
     void restartSource(std::string &sceneId, std::string &sourceId);
     void switchToScene(std::string &sceneId, std::string &transitionType, int transitionMs);
+    const std::map<std::string, Scene*>& getScenes() { return scenes; }
 
 private:
     static void loadModule(const std::string &binPath, const std::string &dataPath);

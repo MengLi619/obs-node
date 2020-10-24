@@ -11,6 +11,17 @@ SourceType Source::getSourceType(const std::string &sourceType) {
     }
 }
 
+std::string Source::getSourceTypeString(SourceType sourceType) {
+    switch (sourceType) {
+        case Image:
+            return "Image";
+        case MediaSource:
+            return "MediaSource";
+        default:
+            throw std::invalid_argument("Invalid sourceType: " + std::to_string(sourceType));
+    }
+}
+
 Source::Source(std::string &id, SourceType type, std::string &url, obs_scene_t *obs_scene, Settings *settings)
         : id(id),
           type(type),
@@ -64,4 +75,12 @@ void Source::stop() {
     obs_source_remove(obs_source);
     obs_source_release(obs_source);
     this->started = false;
+}
+
+Napi::Object Source::getNapiSource(const Napi::Env &env) {
+    auto source = Napi::Object::New(env);
+    source.Set("id", id);
+    source.Set("type", getSourceTypeString(type));
+    source.Set("url", url);
+    return source;
 }
