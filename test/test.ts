@@ -1,7 +1,6 @@
 import * as obs from '../src';
 import { SourceType } from "../src";
 import * as readline from 'readline';
-import * as x11 from 'x11';
 
 interface Source {
     sceneId: string;
@@ -11,7 +10,6 @@ interface Source {
 }
 
 const settings: obs.Settings = {
-    showName: 'default',
     server: 'rtmp://host.docker.internal/live',
     key: 'output',
     videoHWDecode: false,
@@ -47,18 +45,11 @@ const sources: Source[] = [
     }
 ];
 
-x11.createClient((err, display) => {
-    if (err) {
-        console.log(err);
-    } else {
-        obs.startup(settings);
-        sources.forEach(s => {
-            obs.addScene(s.sceneId);
-            obs.addSource(s.sceneId, s.sourceId, s.sourceType, s.sourceUrl);
-        });
-    }
+obs.startup(settings);
+sources.forEach(s => {
+    obs.addScene(s.sceneId);
+    obs.addSource(s.sceneId, s.sourceId, s.sourceType, s.sourceUrl);
 });
-
 
 const readLine = readline.createInterface({
     input: process.stdin,

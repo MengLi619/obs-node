@@ -8,7 +8,6 @@ class Settings {
 public:
     explicit Settings(const Napi::Object& settings);
 
-    std::string show_name;
     std::string server;
     std::string key;
     bool video_hw_decode;

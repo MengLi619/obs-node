@@ -2,7 +2,6 @@
 #include "trace.h"
 
 Settings::Settings(const Napi::Object& settings) {
-    show_name = settings.Get("showName").As<Napi::String>();
     server = settings.Get("server").As<Napi::String>();
     key = settings.Get("key").As<Napi::String>();
     video_hw_decode = settings.Get("videoHWDecode").As<Napi::Boolean>();
@@ -22,7 +21,6 @@ Settings::Settings(const Napi::Object& settings) {
     tune = settings.Get("tune").As<Napi::String>();
     x264opts = settings.Get("x264opts").As<Napi::String>();
 
-    trace_debug("", field_s(show_name))
     trace_debug("", field_s(server))
     trace_debug("", field_s(key))
     trace_debug("", field(video_hw_decode))
