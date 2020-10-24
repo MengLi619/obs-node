@@ -1,4 +1,4 @@
-## overview
+## Overview
 
 This project is heavily reference to the [obs-headless](https://github.com/a-rose/obs-headless). 
 And wrap the [obs-studio](https://github.com/obsproject/obs-studio) with [node-addon-api](https://github.com/nodejs/node-addon-api)
@@ -10,7 +10,7 @@ upload to the github packages.
 While the package is installed from github, prebuild libs will also be downloaded from github packages. without the need 
 to build from user machine. Currently macos, linux (ubuntu20.04) is supported.
 
-## scripts
+## Scripts
 1. Build prebuild libs
     ```shell script
     bash scripts/build.sh <all/obs-studio/obs-node>
