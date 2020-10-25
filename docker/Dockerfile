@@ -49,10 +49,10 @@ RUN apt-get update && \
     libx11-xcb-dev \
     libxcb1-dev \
     x11vnc \
+    libnvidia-encode-450 \
     xserver-xorg-video-dummy \
-    xserver-xorg-input-void
-
-RUN apt-get install -y patchelf
+    xserver-xorg-input-void \
+    patchelf
 
 COPY xorg.conf /etc/xorg.conf
 COPY entrypoint.sh /entrypoint.sh

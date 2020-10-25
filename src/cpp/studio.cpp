@@ -86,7 +86,7 @@ void Studio::startup() {
 
         // output
         // audio encoder
-        audio_encoder = obs_audio_encoder_create("libfdk_aac", "aac enc", nullptr, 0, nullptr);
+        audio_encoder = obs_audio_encoder_create("ffmpeg_aac", "aac enc", nullptr, 0, nullptr);
         if (!audio_encoder) {
             throw std::runtime_error("Failed to create audio encoder.");
         }
