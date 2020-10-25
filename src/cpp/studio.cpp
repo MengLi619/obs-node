@@ -79,7 +79,6 @@ void Studio::startup() {
         loadModule(getObsPluginPath() + "/obs-transitions.so", getObsPluginDataPath() + "/obs-transitions");
         loadModule(getObsPluginPath() + "/rtmp-services.so", getObsPluginDataPath() + "/rtmp-services");
         loadModule(getObsPluginPath() + "/obs-x264.so", getObsPluginDataPath() + "/obs-x264");
-        loadModule(getObsPluginPath() + "/obs-libfdk.so", getObsPluginDataPath() + "/obs-libfdk");
         loadModule(getObsPluginPath() + "/obs-outputs.so", getObsPluginDataPath() + "/obs-outputs");
 
         obs_post_load_modules();
