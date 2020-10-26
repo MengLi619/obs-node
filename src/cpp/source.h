@@ -31,5 +31,6 @@ private:
     obs_scene_t *obs_scene;
     Settings *settings;
     obs_source_t *obs_source;
+    obs_scene_item *obs_scene_item;
     bool started;
 };

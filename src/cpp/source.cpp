@@ -29,6 +29,7 @@ Source::Source(std::string &id, SourceType type, std::string &url, obs_scene_t *
           obs_scene(obs_scene),
           settings(settings),
           obs_source(nullptr),
+          obs_scene_item(nullptr),
           started(false) {
 }
 
@@ -55,7 +56,7 @@ void Source::start() {
     }
 
     // Add the source to the scene
-    obs_sceneitem_t *obs_scene_item = obs_scene_add(obs_scene, obs_source);
+    obs_scene_item = obs_scene_add(obs_scene, obs_source);
     if (!obs_scene_item) {
         throw std::runtime_error("Failed to add scene item.");
     }
@@ -72,8 +73,12 @@ void Source::start() {
 }
 
 void Source::stop() {
+    // Call obs_sceneitem_remove but not obs_sceneitem_release to avoid a segfault
+    obs_sceneitem_remove(obs_scene_item);
     obs_source_remove(obs_source);
     obs_source_release(obs_source);
+    obs_source = nullptr;
+    obs_scene_item = nullptr;
     this->started = false;
 }
 
