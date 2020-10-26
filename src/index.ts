@@ -10,7 +10,7 @@ declare namespace obs {
 
     export type SourceType = 'Image' | 'MediaSource';
 
-    export type TransitionType = 'cut_transition';
+    export type TransitionType = 'cut_transition' | 'fade_transition' | 'swipe_transition' | 'slide_transition';
 
     export interface Scene {
         id: string;
@@ -50,6 +50,7 @@ declare namespace obs {
         shutdown(): void;
         addScene(sceneId: string): string;
         addSource(sceneId: string, sourceId: string, sourceType: SourceType, sourceUrl: string): void;
+        restartSource(sceneId: string, sourceId: string);
         switchToScene(sceneId: string, transitionType: TransitionType, transitionMs: number): void;
         getScenes(): Scene[];
     }
