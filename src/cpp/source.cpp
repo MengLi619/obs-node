@@ -69,17 +69,18 @@ void Source::start() {
     obs_sceneitem_set_bounds_type(obs_scene_item, OBS_BOUNDS_SCALE_INNER);
     obs_sceneitem_set_bounds(obs_scene_item, &bounds);
     obs_sceneitem_set_bounds_alignment(obs_scene_item, align);
-    this->started = true;
+    started = true;
 }
 
 void Source::stop() {
-    // Call obs_sceneitem_remove but not obs_sceneitem_release to avoid a segfault
+    // obs_sceneitem_remove will call obs_sceneitem_release internally,
+    // so it's no need to call obs_sceneitem_release.
     obs_sceneitem_remove(obs_scene_item);
     obs_source_remove(obs_source);
     obs_source_release(obs_source);
     obs_source = nullptr;
     obs_scene_item = nullptr;
-    this->started = false;
+    started = false;
 }
 
 Napi::Object Source::getNapiSource(const Napi::Env &env) {
