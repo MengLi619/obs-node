@@ -1,7 +1,22 @@
+import * as os from 'os';
 import * as path from 'path';
 
-const obs: obs.ObsNode = require('../prebuild/obs-node.node');
-const obsPath = path.resolve(__dirname, '../prebuild/obs-studio');
+process.chdir(path.resolve(__dirname, '../prebuild/bin/64bit'));
+
+let obs: obs.ObsNode;
+switch(os.platform()) {
+    case 'win32':
+    case 'linux':
+        obs = require('../prebuild/bin/64bit/obs-node.node');
+        break;
+    case 'darwin':
+        obs = require('../prebuild/bin/obs-node.node');
+        break;
+    default:
+        throw new Error(`Unsupported platform: ${os.platform()}`);
+}
+
+const obsPath = path.resolve(__dirname, '../prebuild');
 obs.setObsPath(obsPath);
 
 declare namespace obs {

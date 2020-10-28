@@ -1,5 +1,5 @@
 #include "settings.h"
-#include "trace.h"
+#include <obs.h>
 
 Settings::Settings(const Napi::Object& settings) {
     server = settings.Get("server").As<Napi::String>();
@@ -21,22 +21,22 @@ Settings::Settings(const Napi::Object& settings) {
     tune = settings.Get("tune").As<Napi::String>();
     x264opts = settings.Get("x264opts").As<Napi::String>();
 
-    trace_debug("", field_s(server))
-    trace_debug("", field_s(key))
-    trace_debug("", field(video_hw_decode))
-    trace_debug("", field(video_hw_encode))
-    trace_debug("", field(video_gpu_conversion))
-    trace_debug("", field(video_bitrate_kbps))
-    trace_debug("", field(video_keyint_sec))
-    trace_debug("", field_s(video_rate_control))
-    trace_debug("", field(video_width))
-    trace_debug("", field(video_height))
-    trace_debug("", field(video_fps_num))
-    trace_debug("", field(video_fps_den))
-    trace_debug("", field(audio_sample_rate))
-    trace_debug("", field(audio_bitrate_kbps))
-    trace_debug("", field_s(preset))
-    trace_debug("", field_s(profile))
-    trace_debug("", field_s(tune))
-    trace_debug("", field_s(x264opts))
+    blog(LOG_INFO, "server = %s", server.c_str());
+    blog(LOG_INFO, "key = %s", key.c_str());
+    blog(LOG_INFO, "video_hw_decode = %s", video_hw_decode ? "true" : "false");
+    blog(LOG_INFO, "video_hw_encode = %s", video_hw_encode ? "true" : "false");
+    blog(LOG_INFO, "video_gpu_conversion = %s", video_gpu_conversion ? "true" : "false");
+    blog(LOG_INFO, "video_bitrate_kbps = %d", video_bitrate_kbps);
+    blog(LOG_INFO, "video_keyint_sec = %d", video_keyint_sec);
+    blog(LOG_INFO, "video_rate_control = %s", video_rate_control.c_str());
+    blog(LOG_INFO, "video_width = %d", video_width);
+    blog(LOG_INFO, "video_height = %d", video_height);
+    blog(LOG_INFO, "video_fps_num = %d", video_fps_num);
+    blog(LOG_INFO, "video_fps_den = %d", video_fps_den);
+    blog(LOG_INFO, "audio_sample_rate = %d", audio_sample_rate);
+    blog(LOG_INFO, "audio_bitrate_kbps = %d", audio_bitrate_kbps);
+    blog(LOG_INFO, "preset = %s", preset.c_str());
+    blog(LOG_INFO, "profile = %s", profile.c_str());
+    blog(LOG_INFO, "tune = %s", tune.c_str());
+    blog(LOG_INFO, "x264opts = %s", x264opts.c_str());
 }

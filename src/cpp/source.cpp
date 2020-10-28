@@ -1,5 +1,4 @@
 #include "source.h"
-#include "trace.h"
 
 SourceType Source::getSourceType(const std::string &sourceType) {
     if (sourceType == "Image") {
@@ -63,8 +62,8 @@ void Source::start() {
 
     // Scale source to output size by setting bounds
     struct vec2 bounds = {};
-    bounds.x = settings->video_width;
-    bounds.y = settings->video_height;
+    bounds.x = (float)settings->video_width;
+    bounds.y = (float)settings->video_height;
     uint32_t align = OBS_ALIGN_TOP + OBS_ALIGN_LEFT;
     obs_sceneitem_set_bounds_type(obs_scene_item, OBS_BOUNDS_SCALE_INNER);
     obs_sceneitem_set_bounds(obs_scene_item, &bounds);

@@ -6,9 +6,10 @@ MAXOS_DEPS_VERSION=2020-08-30
 
 BASE_DIR="$(pwd)"
 BUILD_DIR="${BASE_DIR}/build"
-OBS_STUDIO_DIR="${BUILD_DIR}/obs-studio-${OBS_STUDIO_VERSION}"
-MACOS_DEPS_DIR="${BUILD_DIR}/macos-deps-${MAXOS_DEPS_VERSION}"
-OBS_INSTALL_PREFIX="${BUILD_DIR}/obs-installed"
+OBS_STUDIO_BUILD_DIR="${BASE_DIR}/obs-studio-build"
+OBS_STUDIO_DIR="${OBS_STUDIO_BUILD_DIR}/obs-studio-${OBS_STUDIO_VERSION}"
+MACOS_DEPS_DIR="${OBS_STUDIO_BUILD_DIR}/macos-deps-${MAXOS_DEPS_VERSION}"
+OBS_INSTALL_PREFIX="${OBS_STUDIO_BUILD_DIR}/obs-installed"
 PREBUILD_DIR="${BASE_DIR}/prebuild"
 
 BUILD_TYPE=$1
@@ -78,7 +79,6 @@ if [[ $BUILD_TYPE == 'all' || $BUILD_TYPE == 'obs-studio' ]]; then
   popd
 
   # Copy obs files to prebuild
-  rm -rf "${PREBUILD_DIR}/obs-studio" && mkdir -p "${PREBUILD_DIR}/obs-studio"
   if [[ "$OSTYPE" == "darwin"* ]]; then
     cp -r "${OBS_INSTALL_PREFIX}"/{bin,data,obs-plugins} "${PREBUILD_DIR}/obs-studio"
   elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
