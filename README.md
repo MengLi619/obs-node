@@ -1,6 +1,6 @@
 ## Overview
 
-This project is heavily reference to the [obs-headless](https://github.com/a-rose/obs-headless). 
+This project is heavily reference from the [obs-headless](https://github.com/a-rose/obs-headless). 
 And wrap the [obs-studio](https://github.com/obsproject/obs-studio) with [node-addon-api](https://github.com/nodejs/node-addon-api)
 to used by NodeJs application.
 

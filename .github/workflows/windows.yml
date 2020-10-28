@@ -1,0 +1,25 @@
+name: obs-node
+
+on:
+  push:
+    tags:
+      - '*'
+
+env:
+  GITHUB_USER: Mengli619
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Build
+        run: scripts\build-windows.cmd all
+        shell: bash
+
+      - name: Upload
+        run: npm run upload
+        shell: bash
