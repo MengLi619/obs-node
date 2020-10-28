@@ -1,6 +1,21 @@
+import * as os from 'os';
 import * as path from 'path';
 
-const obs: obs.ObsNode = require('../prebuild/obs-node.node');
+let obs: obs.ObsNode;
+let cwd = process.cwd();
+try {
+    if (os.platform() === "win32") {
+        // for windows, set working directory to load obs dependencies.
+        process.chdir(path.resolve(__dirname, '../prebuild/obs-studio/bin/64bit'));
+    }
+    obs = require('../prebuild/obs-node.node');
+} finally {
+    if (os.platform() === "win32") {
+        process.chdir(cwd);
+    }
+}
+
+// set obs studio path before calling any function.
 const obsPath = path.resolve(__dirname, '../prebuild/obs-studio');
 obs.setObsPath(obsPath);
 

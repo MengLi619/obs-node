@@ -1,5 +1,4 @@
 #include "scene.h"
-#include "trace.h"
 
 Scene::Scene(std::string &id, Settings *settings) :
         id(id),
@@ -26,7 +25,7 @@ void Scene::restartSource(std::string &sourceId) {
 
 obs_scene_t *Scene::createObsScene(std::string &sceneId) {
     obs_scene_t *scene = obs_scene_create(sceneId.c_str());
-    if (!scene) {
+    if (scene == nullptr) {
         throw std::runtime_error("Failed to create obs scene " + sceneId);
     }
     return scene;

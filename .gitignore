@@ -1,5 +1,6 @@
 node_modules/
 build/
-dist/
+obs-studio-build/
 prebuild/
+dist/
 .idea/

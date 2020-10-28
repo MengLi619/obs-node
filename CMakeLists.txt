@@ -47,6 +47,10 @@ elseif(UNIX)
         ${OBS_STUDIO_DIR}/bin/64bit/libobs.so
         Qt5::Widgets
     )
+elseif(WIN32)
+    LIST(APPEND OBS_NODE_DEPS
+        ${OBS_STUDIO_DIR}/bin/64bit/obs.lib
+    )
 endif()
 
 target_link_libraries(${PROJECT_NAME}

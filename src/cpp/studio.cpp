@@ -1,5 +1,4 @@
 #include "studio.h"
-#include "trace.h"
 #include "scene.h"
 #include <filesystem>
 #include <obs.h>
@@ -22,6 +21,7 @@ void Studio::startup() {
     obs_data_t *output_service_settings = nullptr;
 
     // Change work directory to obs bin path to setup obs properly.
+    blog(LOG_INFO, "Set work directory to %s for loading obs data", getObsBinPath().c_str());
     std::filesystem::current_path(getObsBinPath());
 
     auto restore = [&] {
@@ -47,7 +47,11 @@ void Studio::startup() {
         obs_video_info ovi = {};
         memset(&ovi, 0, sizeof(ovi));
         ovi.adapter = 0;
+#ifdef _WIN32
+        ovi.graphics_module = "libobs-opengl.dll";
+#else
         ovi.graphics_module = "libobs-opengl.so";
+#endif
         ovi.output_format = VIDEO_FORMAT_NV12;
         ovi.fps_num = settings->video_fps_num;
         ovi.fps_den = settings->video_fps_den;
@@ -74,12 +78,22 @@ void Studio::startup() {
         }
 
         // load modules
+#ifdef _WIN32
+        loadModule(getObsPluginPath() + "\\image-source.dll", getObsPluginDataPath() + "\\image-source");
+        loadModule(getObsPluginPath() + "\\obs-ffmpeg.dll", getObsPluginDataPath() + "\\obs-ffmpeg");
+        loadModule(getObsPluginPath() + "\\obs-transitions.dll", getObsPluginDataPath() + "\\obs-transitions");
+        loadModule(getObsPluginPath() + "\\rtmp-services.dll", getObsPluginDataPath() + "\\rtmp-services");
+        loadModule(getObsPluginPath() + "\\obs-x264.dll", getObsPluginDataPath() + "\\obs-x264");
+        loadModule(getObsPluginPath() + "\\obs-outputs.dll", getObsPluginDataPath() + "\\obs-outputs");
+#else
         loadModule(getObsPluginPath() + "/image-source.so", getObsPluginDataPath() + "/image-source");
         loadModule(getObsPluginPath() + "/obs-ffmpeg.so", getObsPluginDataPath() + "/obs-ffmpeg");
         loadModule(getObsPluginPath() + "/obs-transitions.so", getObsPluginDataPath() + "/obs-transitions");
         loadModule(getObsPluginPath() + "/rtmp-services.so", getObsPluginDataPath() + "/rtmp-services");
         loadModule(getObsPluginPath() + "/obs-x264.so", getObsPluginDataPath() + "/obs-x264");
         loadModule(getObsPluginPath() + "/obs-outputs.so", getObsPluginDataPath() + "/obs-outputs");
+#endif
+
 
         obs_post_load_modules();
 
@@ -208,16 +222,16 @@ void Studio::restartSource(std::string &sceneId, std::string &sourceId) {
 
 void Studio::switchToScene(std::string &sceneId, std::string &transitionType, int transitionMs) {
     Scene *next = findScene(sceneId);
-    if (!next) {
+    if (next == nullptr) {
         throw std::invalid_argument("Can't find scene " + sceneId);
     }
 
     if (next == currentScene) {
-        trace_info("Same with current scene, no need to switch, skip.")
+        blog(LOG_INFO, "Same with current scene, no need to switch, skip.");
         return;
     }
 
-    trace_info("Start transition: " + (currentScene ? currentScene->getId() : "") + " -> " + next->getId())
+    blog(LOG_INFO, "Start transition: %s -> %s", (currentScene ? currentScene->getId().c_str() : ""), next->getId().c_str());
 
     // Find or create transition
     auto it = transitions.find(transitionType);
@@ -248,7 +262,7 @@ void Studio::switchToScene(std::string &sceneId, std::string &transitionType, in
 }
 
 void Studio::loadModule(const std::string &binPath, const std::string &dataPath) {
-    obs_module_t *module;
+    obs_module_t *module = nullptr;
     int code = obs_open_module(&module, binPath.c_str(), dataPath.c_str());
     if (code != MODULE_SUCCESS) {
         throw std::runtime_error("Failed to load module '" + binPath + "'");
@@ -267,7 +281,9 @@ Scene *Studio::findScene(std::string &sceneId) {
 }
 
 std::string Studio::getObsBinPath() {
-#ifdef __linux__
+#ifdef _WIN32
+    return obsPath + "\\bin\\64bit";
+#elif __linux__
     return obsPath + "/bin/64bit";
 #else
     return obsPath + "/bin";
@@ -275,7 +291,10 @@ std::string Studio::getObsBinPath() {
 }
 
 std::string Studio::getObsPluginPath() {
-#ifdef __linux__
+#ifdef _WIN32
+    // Obs plugin path is same with bin path, due to SetDllDirectoryW called in obs-studio/libobs/util/platform-windows.c.
+    return obsPath + "\\bin\\64bit";
+#elif __linux__
     return obsPath + "/obs-plugins/64bit";
 #else
     return obsPath + "/obs-plugins";
@@ -283,5 +302,9 @@ std::string Studio::getObsPluginPath() {
 }
 
 std::string Studio::getObsPluginDataPath() {
+#ifdef _WIN32
+    return obsPath + "\\data\\obs-plugins";
+#else
     return obsPath + "/data/obs-plugins";
+#endif
 }

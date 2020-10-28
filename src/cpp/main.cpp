@@ -1,5 +1,4 @@
 #include "studio.h"
-#include "trace.h"
 #include "utils.h"
 #include <napi.h>
 
@@ -9,9 +8,6 @@
 #include <QPushButton>
 QApplication *qApplication;
 #endif
-
-int gTraceLevel = TRACE_LEVEL_TRACE;
-int gTraceFormat = TRACE_FORMAT_TEXT;
 
 std::string obsPath;
 Studio *studio = nullptr;
