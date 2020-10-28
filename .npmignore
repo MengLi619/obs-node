@@ -1,0 +1,4 @@
+.github/
+docker/
+scripts/
+CMakeLists.txt
