@@ -10,7 +10,7 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  build:
+  build-linux:
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout

@@ -48,8 +48,7 @@ if "%BUILD_OBS_STUDIO%" == "true" (
         if not exist "%WINDOWS_DEPS_VERSION%.zip" (
             curl -kLO "https://obsproject.com/downloads/%WINDOWS_DEPS_VERSION%.zip" -f --retry 5 -C -
         )
-        mkdir "%WINDOWS_DEPS_DIR%" 2>NUL
-        tar -xf "%WINDOWS_DEPS_VERSION%.zip" -C "%WINDOWS_DEPS_DIR%"
+        7z x "%WINDOWS_DEPS_VERSION%.zip" -o"%WINDOWS_DEPS_DIR%"
     )
     mkdir "%OBS_STUDIO_DIR%\build" 2>NUL
     cd "%OBS_STUDIO_DIR%\build"
