@@ -5,9 +5,10 @@ set WINDOWS_DEPS_VERSION=dependencies2017
 
 set BASE_DIR=%CD%
 set BUILD_DIR=%BASE_DIR%\build
-set OBS_STUDIO_DIR=%BASE_DIR%\obs-studio-build\obs-studio-%OBS_STUDIO_VERSION%
-set WINDOWS_DEPS_DIR=%BASE_DIR%\obs-studio-build\%WINDOWS_DEPS_VERSION%
-set OBS_INSTALL_PREFIX=%BASE_DIR%\obs-studio-build\obs-installed
+set OBS_STUDIO_BUILD_DIR=%BASE_DIR%\obs-studio-build
+set OBS_STUDIO_DIR=%OBS_STUDIO_BUILD_DIR%\obs-studio-%OBS_STUDIO_VERSION%
+set WINDOWS_DEPS_DIR=%OBS_STUDIO_BUILD_DIR%\%WINDOWS_DEPS_VERSION%
+set OBS_INSTALL_PREFIX=%OBS_STUDIO_BUILD_DIR%\obs-installed
 set PREBUILD_DIR=%BASE_DIR%\prebuild
 
 set BUILD_TYPE=%1
@@ -35,7 +36,6 @@ if not "%RELEASE_TYPE%" == "Release" (
     )
 )
 
-mkdir "%BUILD_DIR%" 2>NUL
 mkdir "%PREBUILD_DIR%" 2>NUL
 if "%BUILD_OBS_STUDIO%" == "true" (
     echo "Building obs-studio"
@@ -60,20 +60,24 @@ if "%BUILD_OBS_STUDIO%" == "true" (
         -DDISABLE_PYTHON=ON ^
         -DCMAKE_BUILD_TYPE="%RELEASE_TYPE%" ^
         ..
+    rmdir /s /q %OBS_INSTALL_PREFIX% 2>NUL
     cmake --build . --target install --config %RELEASE_TYPE% -v
 
     cd "%BASE_DIR%"
     :: Copy obs files to prebuild
     echo "Copy obs installed files to prebuild"
-    xcopy "%OBS_INSTALL_PREFIX%\bin" "%PREBUILD_DIR%\bin\" /E /Y
-    xcopy "%OBS_INSTALL_PREFIX%\data" "%PREBUILD_DIR%\data\" /E /Y
+    rmdir /s /q "%PREBUILD_DIR%\obs-studio" 2>NUL
+    mkdir "%PREBUILD_DIR%\obs-studio" 2>NUL
+    xcopy "%OBS_INSTALL_PREFIX%\bin" "%PREBUILD_DIR%\obs-studio\bin\" /E /Y
+    xcopy "%OBS_INSTALL_PREFIX%\data" "%PREBUILD_DIR%\obs-studio\data\" /E /Y
     :: copy plugins to bin directory to make loadModule work
-    xcopy "%OBS_INSTALL_PREFIX%\obs-plugins\64bit" "%PREBUILD_DIR%\bin\64bit\" /E /Y
+    xcopy "%OBS_INSTALL_PREFIX%\obs-plugins\64bit" "%PREBUILD_DIR%\obs-studio\bin\64bit\" /E /Y
 )
 
 if "%BUILD_OBS_NODE%" == "true" (
   echo "Building obs-node"
   rmdir /s /q "build" 2>NUL
+  mkdir "build" 2>NUL
   if not exist "%BASE_DIR%\node_modules" (
     npm ci
   )
@@ -85,6 +89,6 @@ if "%BUILD_OBS_NODE%" == "true" (
   cmake --build build --config %RELEASE_TYPE%
 
   :: Copy obs-node to prebuild
-  echo "Copy %BUILD_DIR%\%RELEASE_TYPE%\obs-node.node to %PREBUILD_DIR%\bin\64bit\"
-  copy /y "%BUILD_DIR%\%RELEASE_TYPE%\obs-node.node" "%PREBUILD_DIR%\bin\64bit"
+  echo "Copy %BUILD_DIR%\%RELEASE_TYPE%\obs-node.node to %PREBUILD_DIR%"
+  copy /y "%BUILD_DIR%\%RELEASE_TYPE%\obs-node.node" "%PREBUILD_DIR%"
 )
