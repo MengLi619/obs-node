@@ -39,6 +39,8 @@ if not "%RELEASE_TYPE%" == "Release" (
 mkdir "%PREBUILD_DIR%" 2>NUL
 if "%BUILD_OBS_STUDIO%" == "true" (
     echo "Building obs-studio"
+    mkdir "%OBS_STUDIO_BUILD_DIR%" 2>NUL
+    cd "%OBS_STUDIO_BUILD_DIR%"
     if not exist "%OBS_STUDIO_DIR%" (
         git clone --recursive -b %OBS_STUDIO_VERSION% --single-branch https://github.com/obsproject/obs-studio.git "obs-studio-%OBS_STUDIO_VERSION%"
     )

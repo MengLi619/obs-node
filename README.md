@@ -11,7 +11,8 @@ While the package is installed from github, prebuild libs will also be downloade
 to build from user machine. Currently windows(64bit), macos, linux (ubuntu20.04) is supported.
 
 ## Windows build requirements
-[Visual Studio 2019](https://visualstudio.microsoft.com/vs/)
+[7z](https://www.7-zip.org/a/7z1900-x64.exe)    
+[Visual Studio 2019](https://visualstudio.microsoft.com/vs/)    
 [Windows 10 SDK (minimum 10.0.19041.0)](https://developer.microsoft.com/en-us/windows/downloads/windows-10-sdk/)
 
 ## Scripts

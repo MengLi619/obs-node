@@ -2,5 +2,6 @@ node_modules/
 build/
 obs-studio-build/
 prebuild/
+cmake-*/
 dist/
 .idea/
