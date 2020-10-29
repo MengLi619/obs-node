@@ -42,7 +42,9 @@ void Source::start() {
         obs_data_set_string(obs_data, "input", url.c_str());
         obs_data_set_bool(obs_data, "is_local_file", false);
         obs_data_set_bool(obs_data, "looping", false);
-        obs_data_set_bool(obs_data, "hw_decode", settings->video_hw_decode);
+        if (settings->videoDecoder) {
+            obs_data_set_bool(obs_data, "hw_decode", settings->videoDecoder->hardwareEnable);
+        }
         obs_data_set_bool(obs_data, "close_when_inactive", false);
         obs_data_set_bool(obs_data, "restart_on_activate", false);
         obs_source = obs_source_create("ffmpeg_source", this->id.c_str(), obs_data, nullptr);
@@ -61,14 +63,16 @@ void Source::start() {
     }
 
     // Scale source to output size by setting bounds
-    struct vec2 bounds = {};
-    bounds.x = (float)settings->video_width;
-    bounds.y = (float)settings->video_height;
-    uint32_t align = OBS_ALIGN_TOP + OBS_ALIGN_LEFT;
-    obs_sceneitem_set_bounds_type(obs_scene_item, OBS_BOUNDS_SCALE_INNER);
-    obs_sceneitem_set_bounds(obs_scene_item, &bounds);
-    obs_sceneitem_set_bounds_alignment(obs_scene_item, align);
-    started = true;
+    if (settings->video && settings->video->baseWidth > 0 && settings->video->baseHeight > 0) {
+        struct vec2 bounds = {};
+        bounds.x = (float)settings->video->baseWidth;
+        bounds.y = (float)settings->video->baseHeight;
+        uint32_t align = OBS_ALIGN_TOP + OBS_ALIGN_LEFT;
+        obs_sceneitem_set_bounds_type(obs_scene_item, OBS_BOUNDS_SCALE_INNER);
+        obs_sceneitem_set_bounds(obs_scene_item, &bounds);
+        obs_sceneitem_set_bounds_alignment(obs_scene_item, align);
+        started = true;
+    }
 }
 
 void Source::stop() {
@@ -80,6 +84,21 @@ void Source::stop() {
     obs_source = nullptr;
     obs_scene_item = nullptr;
     started = false;
+}
+
+void Source::updateUrl(std::string &sourceUrl) {
+    stop();
+    url = sourceUrl;
+    start();
+}
+
+void Source::mute(bool mute) {
+    if (obs_source) {
+        obs_source_set_muted(obs_source, mute);
+        if (!mute && obs_source_get_monitoring_type(obs_source) == OBS_MONITORING_TYPE_NONE) {
+            obs_source_set_monitoring_type(obs_source, OBS_MONITORING_TYPE_MONITOR_ONLY);
+        }
+    }
 }
 
 Napi::Object Source::getNapiSource(const Napi::Env &env) {

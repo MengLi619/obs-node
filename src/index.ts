@@ -3,14 +3,15 @@ import * as path from 'path';
 
 let obs: obs.ObsNode;
 let cwd = process.cwd();
+const isWindows = os.platform() === "win32";
 try {
-    if (os.platform() === "win32") {
-        // for windows, set working directory to load obs dependencies.
+    if (isWindows) {
+        // for windows, we need set working directory to obs binary path to load obs dependencies correctly.
         process.chdir(path.resolve(__dirname, '../prebuild/obs-studio/bin/64bit'));
     }
     obs = require('../prebuild/obs-node.node');
 } finally {
-    if (os.platform() === "win32") {
+    if (isWindows) {
         process.chdir(cwd);
     }
 }
@@ -38,25 +39,59 @@ declare namespace obs {
         url: string;
     }
 
-    export interface Settings {
-        server: string;
-        key: string;
-        videoHWDecode: boolean;
-        videoHWEncode: boolean;
-        videoGpuConversion: boolean;
-        videoBitrateKbps: number;
-        videoKeyintSec: number;
-        videoRateControl: RateControl;
-        videoWidth: number;
-        videoHeight: number;
-        videoFpsNum: number;
-        videoFpsDen: number;
-        audioSampleRate: number;
-        audioBitrateKbps: number;
+    export interface VideoSettings {
+        baseWidth: number;
+        baseHeight: number;
+        outputWidth: number;
+        outputHeight: number;
+        fpsNum: number;
+        fpsDen: number;
+    }
+
+    export interface AudioSettings {
+        sampleRate: number;
+    }
+
+    export interface VideoDecoderSettings {
+        hardwareEnable: boolean;
+    }
+
+    export interface VideoEncoderSettings {
+        hardwareEnable: boolean;
+        width: number;
+        height: number;
+        bitrateKbps: number;
+        keyintSec: number;
+        rateControl: RateControl;
         preset: string;
         profile: string;
         tune: string;
-        x264opts: string;
+        x264opts?: string;
+    }
+
+    export interface AudioEncoderSettings {
+        bitrateKbps: number;
+    }
+
+    export interface OutputSettings {
+        server: string;
+        key: string;
+    }
+
+    export interface Settings {
+        video: VideoSettings;
+        audio: AudioSettings;
+        videoDecoder?: VideoDecoderSettings;
+        videoEncoder?: VideoEncoderSettings;
+        audioEncoder?: AudioEncoderSettings;
+        output?: OutputSettings;
+    }
+
+    export interface Bounds {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
     }
 
     export interface ObsNode {
@@ -65,9 +100,14 @@ declare namespace obs {
         shutdown(): void;
         addScene(sceneId: string): string;
         addSource(sceneId: string, sourceId: string, sourceType: SourceType, sourceUrl: string): void;
+        updateSource(sceneId: string, sourceId: string, sourceUrl: string): void;
+        muteSource(sceneId: string, sourceId: string, mute: boolean): void;
         restartSource(sceneId: string, sourceId: string);
         switchToScene(sceneId: string, transitionType: TransitionType, transitionMs: number): void;
         getScenes(): Scene[];
+        createDisplay(name: string, parentWindow: Buffer, scaleFactor: number, sourceId: string);
+        destroyDisplay(name: string);
+        moveDisplay(name: string, x: number, y: number, width: number, height: number);
     }
 }
 

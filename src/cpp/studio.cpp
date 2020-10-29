@@ -1,12 +1,10 @@
 #include "studio.h"
-#include "scene.h"
 #include <filesystem>
 #include <obs.h>
 
 Studio::Studio(std::string &obsPath, Settings *settings)
         : obsPath(obsPath),
           settings(settings),
-          started(false),
           currentScene(nullptr),
           video_encoder(nullptr),
           audio_encoder(nullptr),
@@ -44,37 +42,39 @@ void Studio::startup() {
         }
 
         // reset video
-        obs_video_info ovi = {};
-        memset(&ovi, 0, sizeof(ovi));
-        ovi.adapter = 0;
+        if (settings->video) {
+            obs_video_info ovi = {};
+            memset(&ovi, 0, sizeof(ovi));
+            ovi.adapter = 0;
 #ifdef _WIN32
-        ovi.graphics_module = "libobs-opengl.dll";
+            ovi.graphics_module = "libobs-opengl.dll";
 #else
-        ovi.graphics_module = "libobs-opengl.so";
+            ovi.graphics_module = "libobs-opengl.so";
 #endif
-        ovi.output_format = VIDEO_FORMAT_NV12;
-        ovi.fps_num = settings->video_fps_num;
-        ovi.fps_den = settings->video_fps_den;
-        ovi.base_width = settings->video_width;
-        ovi.base_height = settings->video_height;
-        ovi.output_width = settings->video_width;
-        ovi.output_height = settings->video_height;
-        ovi.gpu_conversion = settings->video_gpu_conversion;
+            ovi.output_format = VIDEO_FORMAT_NV12;
+            ovi.fps_num = settings->video->fpsNum;
+            ovi.fps_den = settings->video->fpsDen;
+            ovi.base_width = settings->video->baseWidth;
+            ovi.base_height = settings->video->baseHeight;
+            ovi.output_width = settings->video->outputWidth;
+            ovi.output_height = settings->video->outputHeight;
+            ovi.gpu_conversion = true; // always be true for the OBS issue
 
-        int result = obs_reset_video(&ovi);
-        if (result != OBS_VIDEO_SUCCESS) {
-            throw std::runtime_error("Failed to reset video");
+            int result = obs_reset_video(&ovi);
+            if (result != OBS_VIDEO_SUCCESS) {
+                throw std::runtime_error("Failed to reset video");
+            }
         }
 
         // reset audio
-        obs_audio_info oai = {};
-        memset(&oai, 0, sizeof(oai));
-
-        oai.samples_per_sec = settings->audio_sample_rate;
-        oai.speakers = SPEAKERS_STEREO;
-
-        if (!obs_reset_audio(&oai)) {
-            throw std::runtime_error("Failed to reset audio");
+        if (settings->audio) {
+            obs_audio_info oai = {};
+            memset(&oai, 0, sizeof(oai));
+            oai.samples_per_sec = settings->audio->sampleRate;
+            oai.speakers = SPEAKERS_STEREO;
+            if (!obs_reset_audio(&oai)) {
+                throw std::runtime_error("Failed to reset audio");
+            }
         }
 
         // load modules
@@ -94,89 +94,90 @@ void Studio::startup() {
         loadModule(getObsPluginPath() + "/obs-outputs.so", getObsPluginDataPath() + "/obs-outputs");
 #endif
 
-
         obs_post_load_modules();
 
-        // output
         // audio encoder
-        audio_encoder = obs_audio_encoder_create("ffmpeg_aac", "aac enc", nullptr, 0, nullptr);
-        if (!audio_encoder) {
-            throw std::runtime_error("Failed to create audio encoder.");
-        }
+        if (settings->audioEncoder) {
+            audio_encoder = obs_audio_encoder_create("ffmpeg_aac", "aac enc", nullptr, 0, nullptr);
+            if (!audio_encoder) {
+                throw std::runtime_error("Failed to create audio encoder.");
+            }
 
-        audio_encoder_settings = obs_encoder_get_settings(audio_encoder);
-        if (!audio_encoder_settings) {
-            throw std::runtime_error("Failed to get audio encoder settings.");
-        }
+            audio_encoder_settings = obs_encoder_get_settings(audio_encoder);
+            if (!audio_encoder_settings) {
+                throw std::runtime_error("Failed to get audio encoder settings.");
+            }
 
-        obs_data_set_int(audio_encoder_settings, "bitrate", settings->audio_bitrate_kbps);
-        obs_data_set_bool(audio_encoder_settings, "afterburner", true);
-        obs_encoder_update(audio_encoder, audio_encoder_settings);
-        obs_encoder_set_audio(audio_encoder, obs_get_audio());
+            obs_data_set_int(audio_encoder_settings, "bitrate", settings->audioEncoder->bitrateKbps);
+            obs_encoder_update(audio_encoder, audio_encoder_settings);
+            obs_encoder_set_audio(audio_encoder, obs_get_audio());
+        }
 
         // video encoder
-        std::string encoder = settings->video_hw_encode ? "ffmpeg_nvenc" : "obs_x264";
-        video_encoder = obs_video_encoder_create(encoder.c_str(), "h264 enc", nullptr, nullptr);
-        if (!video_encoder) {
-            throw std::runtime_error("Failed to create video encoder.");
+        if (settings->videoEncoder) {
+            std::string encoder = settings->videoEncoder->hardwareEnable ? "ffmpeg_nvenc" : "obs_x264";
+            video_encoder = obs_video_encoder_create(encoder.c_str(), "h264 enc", nullptr, nullptr);
+            if (!video_encoder) {
+                throw std::runtime_error("Failed to create video encoder.");
+            }
+
+            video_encoder_settings = obs_encoder_get_settings(video_encoder);
+            if (!video_encoder_settings) {
+                throw std::runtime_error("Failed to get video encoder settings.");
+            }
+
+            obs_data_set_int(video_encoder_settings, "bitrate", settings->videoEncoder->bitrateKbps);
+            obs_data_set_int(video_encoder_settings, "keyint_sec", settings->videoEncoder->keyintSec);
+            obs_data_set_string(video_encoder_settings, "rate_control", settings->videoEncoder->rateControl.c_str());
+            obs_data_set_int(video_encoder_settings, "width", settings->videoEncoder->width);
+            obs_data_set_int(video_encoder_settings, "height", settings->videoEncoder->height);
+            obs_data_set_string(video_encoder_settings, "preset", settings->videoEncoder->preset.c_str());
+            obs_data_set_string(video_encoder_settings, "profile", settings->videoEncoder->profile.c_str());
+            obs_data_set_string(video_encoder_settings, "tune", settings->videoEncoder->tune.c_str());
+            obs_data_set_string(video_encoder_settings, "x264opts", settings->videoEncoder->x264opts.c_str());
         }
 
-        video_encoder_settings = obs_encoder_get_settings(video_encoder);
-        if (!video_encoder_settings) {
-            throw std::runtime_error("Failed to get video encoder settings.");
+        // video decoder
+        if (settings->videoDecoder) {
+            obs_encoder_update(video_encoder, video_encoder_settings);
+            obs_encoder_set_video(video_encoder, obs_get_video());
         }
-
-        obs_data_set_int(video_encoder_settings, "bitrate", settings->video_bitrate_kbps);
-        obs_data_set_int(video_encoder_settings, "keyint_sec", settings->video_keyint_sec);
-        obs_data_set_string(video_encoder_settings, "rate_control", settings->video_rate_control.c_str());
-        if (settings->video_hw_encode) {
-            obs_data_set_string(video_encoder_settings, "preset", "default");
-            obs_data_set_string(video_encoder_settings, "profile", "main");
-            obs_data_set_int(video_encoder_settings, "bf", 2);
-            obs_data_set_bool(video_encoder_settings, "psycho_aq", false);
-            obs_data_set_bool(video_encoder_settings, "lookahead", false);
-        } else {
-            obs_data_set_int(video_encoder_settings, "width", settings->video_width);
-            obs_data_set_int(video_encoder_settings, "height", settings->video_height);
-            obs_data_set_int(video_encoder_settings, "fps_num", settings->video_fps_num);
-            obs_data_set_int(video_encoder_settings, "fps_den", settings->video_fps_den);
-            obs_data_set_string(video_encoder_settings, "preset", settings->preset.c_str());
-            obs_data_set_string(video_encoder_settings, "profile", settings->profile.c_str());
-            obs_data_set_string(video_encoder_settings, "tune", settings->tune.c_str());
-            obs_data_set_string(video_encoder_settings, "x264opts", settings->x264opts.c_str());
-        }
-
-        obs_encoder_update(video_encoder, video_encoder_settings);
-        obs_encoder_set_video(video_encoder, obs_get_video());
-
-        // output service
-        output_service = obs_service_create("rtmp_common", "rtmp service", nullptr, nullptr);
-        if (!output_service) {
-            throw std::runtime_error("Failed to create output service.");
-        }
-
-        output_service_settings = obs_data_create();
-        if (!output_service_settings) {
-            throw std::runtime_error("Failed to create output settings.");
-        }
-
-        obs_data_set_string(output_service_settings, "server", settings->server.c_str());
-        obs_data_set_string(output_service_settings, "key", settings->key.c_str());
-        obs_service_update(output_service, output_service_settings);
-        obs_service_apply_encoder_settings(output_service, video_encoder_settings, audio_encoder_settings);
 
         // output
-        output = obs_output_create("rtmp_output", "RTMP output", nullptr, nullptr);
-        if (!output) {
-            throw std::runtime_error("Failed to create output.");
-        }
+        if (settings->output) {
+            output_service = obs_service_create("rtmp_common", "rtmp service", nullptr, nullptr);
+            if (!output_service) {
+                throw std::runtime_error("Failed to create output service.");
+            }
 
-        obs_output_set_video_encoder(output, video_encoder);
-        obs_output_set_audio_encoder(output, audio_encoder, 0);
-        obs_output_set_service(output, output_service);
+            output_service_settings = obs_data_create();
+            if (!output_service_settings) {
+                throw std::runtime_error("Failed to create output settings.");
+            }
 
-        if (!obs_output_start(output)) {
-            throw std::runtime_error("Failed to start output.");
+            obs_data_set_string(output_service_settings, "server", settings->output->server.c_str());
+            obs_data_set_string(output_service_settings, "key", settings->output->key.c_str());
+            obs_service_update(output_service, output_service_settings);
+            obs_service_apply_encoder_settings(output_service, video_encoder_settings, audio_encoder_settings);
+
+            output = obs_output_create("rtmp_output", "RTMP output", nullptr, nullptr);
+            if (!output) {
+                throw std::runtime_error("Failed to create output.");
+            }
+
+            if (video_encoder) {
+                obs_output_set_video_encoder(output, video_encoder);
+            }
+
+            if (audio_encoder) {
+                obs_output_set_audio_encoder(output, audio_encoder, 0);
+            }
+
+            obs_output_set_service(output, output_service);
+
+            if (!obs_output_start(output)) {
+                throw std::runtime_error("Failed to start output.");
+            }
         }
 
         restore();
@@ -196,7 +197,6 @@ void Studio::shutdown() {
     if (obs_initialized()) {
         throw std::runtime_error("Failed to shutdown obs studio.");
     }
-    this->started = false;
 }
 
 void Studio::addScene(std::string &sceneId) {
@@ -210,6 +210,22 @@ void Studio::addSource(std::string &sceneId, std::string &sourceId, SourceType s
         throw std::invalid_argument("Can't find scene " + sceneId);
     }
     it->second->addSource(sourceId, sourceType, sourceUrl);
+}
+
+void Studio::updateSource(std::string &sceneId, std::string &sourceId, std::string &sourceUrl) {
+    auto it = scenes.find(sceneId);
+    if (it == scenes.end()) {
+        throw std::invalid_argument("Can't find scene " + sceneId);
+    }
+    it->second->updateSource(sourceId, sourceUrl);
+}
+
+void Studio::muteSource(std::string &sceneId, std::string &sourceId, bool mute) {
+    auto it = scenes.find(sceneId);
+    if (it == scenes.end()) {
+        throw std::invalid_argument("Can't find scene " + sceneId);
+    }
+    it->second->muteSource(sourceId, mute);
 }
 
 void Studio::restartSource(std::string &sceneId, std::string &sourceId) {
@@ -270,6 +286,37 @@ void Studio::loadModule(const std::string &binPath, const std::string &dataPath)
     if (!obs_init_module(module)) {
         throw std::runtime_error("Failed to load module '" + binPath + "'");
     }
+}
+
+const std::map<std::string, Scene*>& Studio::getScenes() {
+    return scenes;
+}
+
+void Studio::createDisplay(std::string &displayName, void *parentHandle, int scaleFactor, std::string &sourceId) {
+    auto found = displays.find(displayName);
+    if (found != displays.end()) {
+        throw std::logic_error("Display " + displayName + " already existed");
+    }
+    auto *display = new Display(parentHandle, scaleFactor, sourceId);
+    displays[displayName] = display;
+}
+
+void Studio::destroyDisplay(std::string &displayName) {
+    auto found = displays.find(displayName);
+    if (found == displays.end()) {
+        throw std::logic_error("Can't find display: " + displayName);
+    }
+    Display *display = found->second;
+    displays.erase(displayName);
+    delete display;
+}
+
+void Studio::moveDisplay(std::string &displayName, int x, int y, int width, int height) {
+    auto found = displays.find(displayName);
+    if (found == displays.end()) {
+        throw std::logic_error("Can't find display: " + displayName);
+    }
+    found->second->move(x, y, width, height);
 }
 
 Scene *Studio::findScene(std::string &sceneId) {
