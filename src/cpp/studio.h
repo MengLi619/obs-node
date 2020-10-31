@@ -2,6 +2,7 @@
 
 #include "settings.h"
 #include "scene.h"
+#include "display.h"
 #include <map>
 #include <obs.h>
 
@@ -13,9 +14,14 @@ public:
     void shutdown();
     void addScene(std::string &sceneId);
     void addSource(std::string &sceneId, std::string &sourceId, SourceType sourceType, std::string &sourceUrl);
+    void updateSource(std::string &sceneId, std::string &sourceId, std::string &sourceUrl);
+    void muteSource(std::string &sceneId, std::string &sourceId, bool mute);
     void restartSource(std::string &sceneId, std::string &sourceId);
     void switchToScene(std::string &sceneId, std::string &transitionType, int transitionMs);
-    const std::map<std::string, Scene*>& getScenes() { return scenes; }
+    const std::map<std::string, Scene*>& getScenes();
+    void createDisplay(std::string &displayName, void *parentHandle, int scaleFactor, std::string &sourceId);
+    void destroyDisplay(std::string &displayName);
+    void moveDisplay(std::string &displayName, int x, int y, int width, int height);
 
 private:
     static void loadModule(const std::string &binPath, const std::string &dataPath);
@@ -28,7 +34,7 @@ private:
     Settings *settings;
     std::map<std::string, Scene*> scenes;
     std::map<std::string, obs_source_t*> transitions;
-    bool started;
+    std::map<std::string, Display*> displays;
     Scene *currentScene;
     obs_encoder_t *video_encoder;
     obs_encoder_t *audio_encoder;

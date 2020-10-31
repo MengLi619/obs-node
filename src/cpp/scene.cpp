@@ -14,6 +14,22 @@ void Scene::addSource(std::string &sourceId, SourceType sourceType, std::string 
     source->start();
 }
 
+void Scene::updateSource(std::string &sourceId, std::string &sourceUrl) {
+    auto it = sources.find(sourceId);
+    if (it == sources.end()) {
+        throw std::invalid_argument("Can't find source " + sourceId);
+    }
+    it->second->updateUrl(sourceUrl);
+}
+
+void Scene::muteSource(std::string &sourceId, bool mute) {
+    auto it = sources.find(sourceId);
+    if (it == sources.end()) {
+        throw std::invalid_argument("Can't find source " + sourceId);
+    }
+    it->second->mute(mute);
+}
+
 void Scene::restartSource(std::string &sourceId) {
     auto it = sources.find(sourceId);
     if (it == sources.end()) {

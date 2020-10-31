@@ -18,6 +18,10 @@ public:
 
     void stop();
 
+    void updateUrl(std::string &sourceUrl);
+
+    void mute(bool mute);
+
     static SourceType getSourceType(const std::string &sourceType);
 
     Napi::Object getNapiSource(const Napi::Env &env);

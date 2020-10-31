@@ -18,6 +18,10 @@ public:
 
     void addSource(std::string &sourceId, SourceType sourceType, std::string &sourceUrl);
 
+    void updateSource(std::string &sourceId, std::string &sourceUrl);
+
+    void muteSource(std::string &sourceId, bool mute);
+
     void restartSource(std::string &sourceId);
 
     Napi::Object getNapiScene(const Napi::Env &env);
