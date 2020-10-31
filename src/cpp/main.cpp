@@ -106,10 +106,8 @@ Napi::Value createDisplay(const Napi::CallbackInfo &info) {
 }
 
 Napi::Value destroyDisplay(const Napi::CallbackInfo &info) {
-    blog(LOG_INFO, "destroyDisplay - 1");
     std::string displayName = info[0].As<Napi::String>();
     TRY_METHOD(studio->destroyDisplay(displayName))
-    blog(LOG_INFO, "destroyDisplay - 2");
     return info.Env().Undefined();
 }
 
