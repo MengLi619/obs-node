@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <string>
 #include <system_error>
+#include <versionhelpers.h>
 
 #define DISPLAY_WINDOW_CLASS "ObsNodeDisplayWindow"
 
@@ -53,14 +54,15 @@ void registerDisplayWindowClass() {
 }
 
 void *createDisplayWindow(void *parentHandle) {
+    DWORD windowStyle = windowStyle = WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST;
     HWND parentHandleHWND = *static_cast<HWND*>(parentHandle);
     registerDisplayWindowClass();
     HWND windowHandle = CreateWindowEx(
-            0, // WS_EX_COMPOSITED | WS_EX_LAYERED | WS_EX_TRANSPARENT | WS_EX_TOPMOST,
+            windowStyle,
             DISPLAY_WINDOW_CLASS,
             "Display Window",
-            WS_VISIBLE | WS_POPUP,
-            0, 0, 0, 0,
+            WS_VISIBLE | WS_POPUP | WS_CHILD,
+            0, 0, 1, 1,
             parentHandleHWND,
             NULL,
             NULL,
@@ -68,6 +70,7 @@ void *createDisplayWindow(void *parentHandle) {
     if (windowHandle == NULL) {
         throwLastErrorMessage();
     }
+    SetLayeredWindowAttributes(windowHandle, 0, 255, LWA_ALPHA);
     SetParent(windowHandle, parentHandleHWND);
     return reinterpret_cast<void*>(windowHandle);
 }
