@@ -1,5 +1,5 @@
 import * as obs from '../src';
-import { SourceType } from "../src";
+import {SourceType} from '../src';
 import * as readline from 'readline';
 
 interface Source {
@@ -10,24 +10,38 @@ interface Source {
 }
 
 const settings: obs.Settings = {
-    server: 'rtmp://host.docker.internal/live',
-    key: 'output',
-    videoHWDecode: false,
-    videoHWEncode: false,
-    videoGpuConversion: true,
-    videoBitrateKbps: 5000,
-    videoKeyintSec: 1,
-    videoRateControl: 'CBR',
-    videoWidth: 1280,
-    videoHeight: 720,
-    videoFpsNum: 25000,
-    videoFpsDen: 1000,
-    audioSampleRate: 44100,
-    audioBitrateKbps: 64,
-    preset: 'ultrafast',
-    profile: 'main',
-    tune: 'zerolatency',
-    x264opts: '',
+    video: {
+        baseWidth: 1280,
+        baseHeight: 720,
+        outputWidth: 1280,
+        outputHeight: 720,
+        fpsNum: 25,
+        fpsDen: 1,
+    },
+    audio: {
+        sampleRate: 44100,
+    },
+    videoDecoder: {
+        hardwareEnable: false,
+    },
+    videoEncoder: {
+        hardwareEnable: false,
+        width: 1280,
+        height: 720,
+        bitrateKbps: 1000,
+        keyintSec: 1,
+        rateControl: 'CBR',
+        preset: 'ultrafast',
+        profile: 'main',
+        tune: 'zerolatency',
+    },
+    audioEncoder: {
+        bitrateKbps: 64,
+    },
+    output: {
+        server: 'rtmp://host.docker.internal/live',
+        key: 'output',
+    },
 };
 
 const sources: Source[] = [

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.13)
 project(obs-node)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 11)
 
 if (NOT OBS_STUDIO_DIR)
     set(OBS_STUDIO_DIR ${CMAKE_CURRENT_SOURCE_DIR}/obs-studio-build/obs-installed)

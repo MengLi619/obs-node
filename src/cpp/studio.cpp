@@ -1,6 +1,6 @@
 #include "studio.h"
-#include <filesystem>
 #include <obs.h>
+#include <unistd.h>
 
 Studio::Studio(std::string &obsPath, Settings *settings)
         : obsPath(obsPath),
@@ -13,14 +13,15 @@ Studio::Studio(std::string &obsPath, Settings *settings)
 }
 
 void Studio::startup() {
-    auto currentWorkDir = std::filesystem::current_path();
+    std::string currentWorkDir = getcwd(nullptr, 0);
     obs_data_t *audio_encoder_settings = nullptr;
     obs_data_t *video_encoder_settings = nullptr;
     obs_data_t *output_service_settings = nullptr;
 
     // Change work directory to obs bin path to setup obs properly.
-    blog(LOG_INFO, "Set work directory to %s for loading obs data", getObsBinPath().c_str());
-    std::filesystem::current_path(getObsBinPath());
+    std::string obsBinPath = getObsBinPath();
+    blog(LOG_INFO, "Set working directory to %s for loading obs data", obsBinPath.c_str());
+    chdir(obsBinPath.c_str());
 
     auto restore = [&] {
         if (audio_encoder_settings) {
@@ -32,7 +33,7 @@ void Studio::startup() {
         if (output_service_settings) {
             obs_data_release(output_service_settings);
         }
-        std::filesystem::current_path(currentWorkDir);
+        chdir(currentWorkDir.c_str());
     };
 
     try {
@@ -145,7 +146,13 @@ void Studio::startup() {
 
         // output
         if (settings->output) {
-            output_service = obs_service_create("rtmp_common", "rtmp service", nullptr, nullptr);
+            bool is_rtmp = settings->output->server.rfind("rtmp", 0) == 0;
+            if (is_rtmp) {
+                output_service = obs_service_create("rtmp_common", "rtmp service", nullptr, nullptr);
+            } else {
+                output_service = obs_service_create("rtmp_custom", "custom service", nullptr, nullptr);
+            }
+
             if (!output_service) {
                 throw std::runtime_error("Failed to create output service.");
             }
@@ -160,7 +167,12 @@ void Studio::startup() {
             obs_service_update(output_service, output_service_settings);
             obs_service_apply_encoder_settings(output_service, video_encoder_settings, audio_encoder_settings);
 
-            output = obs_output_create("rtmp_output", "RTMP output", nullptr, nullptr);
+            if (is_rtmp) {
+                output = obs_output_create("rtmp_output", "rtmp output", nullptr, nullptr);
+            } else {
+                output = obs_output_create("ffmpeg_output", "ffmpeg output", nullptr, nullptr);
+            }
+
             if (!output) {
                 throw std::runtime_error("Failed to create output.");
             }
