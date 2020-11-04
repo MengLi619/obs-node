@@ -1,6 +1,6 @@
 #include "studio.h"
+#include <filesystem>
 #include <obs.h>
-#include <unistd.h>
 
 Studio::Studio(std::string &obsPath, Settings *settings)
         : obsPath(obsPath),
@@ -13,15 +13,15 @@ Studio::Studio(std::string &obsPath, Settings *settings)
 }
 
 void Studio::startup() {
-    std::string currentWorkDir = getcwd(nullptr, 0);
+    auto currentWorkDir = std::filesystem::current_path();
     obs_data_t *audio_encoder_settings = nullptr;
     obs_data_t *video_encoder_settings = nullptr;
     obs_data_t *output_service_settings = nullptr;
+    obs_data_t *output_settings = nullptr;
 
     // Change work directory to obs bin path to setup obs properly.
-    std::string obsBinPath = getObsBinPath();
-    blog(LOG_INFO, "Set working directory to %s for loading obs data", obsBinPath.c_str());
-    chdir(obsBinPath.c_str());
+    blog(LOG_INFO, "Set work directory to %s for loading obs data", getObsBinPath().c_str());
+    std::filesystem::current_path(getObsBinPath());
 
     auto restore = [&] {
         if (audio_encoder_settings) {
@@ -33,7 +33,10 @@ void Studio::startup() {
         if (output_service_settings) {
             obs_data_release(output_service_settings);
         }
-        chdir(currentWorkDir.c_str());
+        if (output_settings) {
+            obs_data_release(output_settings);
+        }
+        std::filesystem::current_path(currentWorkDir);
     };
 
     try {
@@ -163,14 +166,25 @@ void Studio::startup() {
             }
 
             obs_data_set_string(output_service_settings, "server", settings->output->server.c_str());
-            obs_data_set_string(output_service_settings, "key", settings->output->key.c_str());
+
+            if (!settings->output->key.empty()) {
+                obs_data_set_string(output_service_settings, "key", settings->output->key.c_str());
+            }
+
             obs_service_update(output_service, output_service_settings);
             obs_service_apply_encoder_settings(output_service, video_encoder_settings, audio_encoder_settings);
 
             if (is_rtmp) {
                 output = obs_output_create("rtmp_output", "rtmp output", nullptr, nullptr);
+
             } else {
-                output = obs_output_create("ffmpeg_output", "ffmpeg output", nullptr, nullptr);
+                output = obs_output_create("ffmpeg_mpegts_muxer", "ffmpeg mpegts muxer output", nullptr, nullptr);
+                output_settings = obs_output_get_settings(output);
+#ifdef _WIN32
+                obs_data_set_string(output_settings, "exec_path", (getObsBinPath() + "\\obs-ffmpeg-mux.exe").c_str());
+#else
+                obs_data_set_string(output_settings, "exec_path", (getObsBinPath() + "/obs-ffmpeg-mux").c_str());
+#endif
             }
 
             if (!output) {
