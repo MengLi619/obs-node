@@ -1,6 +1,6 @@
 {
   "name": "obs-node",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "repository": "https://github.com/Mengli619/obs-node.git",
   "main": "dist/index.js",
   "scripts": {
