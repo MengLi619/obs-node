@@ -1,6 +1,6 @@
 @echo off
 
-set OBS_STUDIO_VERSION=26.0.2
+set OBS_STUDIO_VERSION=26.0.2-patch1
 set WINDOWS_DEPS_VERSION=dependencies2017
 
 set BASE_DIR=%CD%
@@ -42,7 +42,7 @@ if "%BUILD_OBS_STUDIO%" == "true" (
     mkdir "%OBS_STUDIO_BUILD_DIR%" 2>NUL
     cd "%OBS_STUDIO_BUILD_DIR%"
     if not exist "%OBS_STUDIO_DIR%" (
-        git clone --recursive -b %OBS_STUDIO_VERSION% --single-branch https://github.com/obsproject/obs-studio.git "obs-studio-%OBS_STUDIO_VERSION%"
+        git clone --recursive -b %OBS_STUDIO_VERSION% --single-branch https://github.com/MengLi619/obs-studio.git "obs-studio-%OBS_STUDIO_VERSION%"
     )
     if not exist "%WINDOWS_DEPS_DIR%" (
         if not exist "%WINDOWS_DEPS_VERSION%.zip" (

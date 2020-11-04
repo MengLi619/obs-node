@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-OBS_STUDIO_VERSION=26.0.2
+OBS_STUDIO_VERSION=26.0.2-patch1
 MAXOS_DEPS_VERSION=2020-08-30
 
 BASE_DIR="$(pwd)"
@@ -30,7 +30,7 @@ if [[ $BUILD_TYPE == 'all' || $BUILD_TYPE == 'obs-studio' ]]; then
   # Clone obs studio
   if [[ ! -d "${OBS_STUDIO_DIR}" ]]; then
     pushd "${OBS_STUDIO_BUILD_DIR}"
-    git clone --recursive -b ${OBS_STUDIO_VERSION} --single-branch https://github.com/obsproject/obs-studio.git "obs-studio-${OBS_STUDIO_VERSION}"
+    git clone --recursive -b ${OBS_STUDIO_VERSION} --single-branch https://github.com/MengLi619/obs-studio.git "obs-studio-${OBS_STUDIO_VERSION}"
     popd
   fi
 
@@ -94,6 +94,7 @@ if [[ $BUILD_TYPE == 'all' || $BUILD_TYPE == 'obs-studio' ]]; then
 
   # Fix loader path for macos
   if [[ "$OSTYPE" == "darwin"* ]]; then
+    sh scripts/fix-loader-path-macos.sh "/tmp/obsdeps" "@loader_path/../deps" "${PREBUILD_DIR}/obs-studio/bin/obs-ffmpeg-mux"
     sh scripts/fix-loader-path-macos.sh "/tmp/obsdeps" "@loader_path/../deps" "${PREBUILD_DIR}/obs-studio/bin/*.{dylib,so}"
     sh scripts/fix-loader-path-macos.sh "/tmp/obsdeps" "@loader_path/../deps" "${PREBUILD_DIR}/obs-studio/obs-plugins/*.so"
     sh scripts/fix-loader-path-macos.sh "/tmp/obsdeps/bin" "@loader_path" "${PREBUILD_DIR}/obs-studio/deps/bin/*.dylib"

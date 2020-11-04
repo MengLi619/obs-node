@@ -17,6 +17,7 @@ void Studio::startup() {
     obs_data_t *audio_encoder_settings = nullptr;
     obs_data_t *video_encoder_settings = nullptr;
     obs_data_t *output_service_settings = nullptr;
+    obs_data_t *output_settings = nullptr;
 
     // Change work directory to obs bin path to setup obs properly.
     blog(LOG_INFO, "Set work directory to %s for loading obs data", getObsBinPath().c_str());
@@ -31,6 +32,9 @@ void Studio::startup() {
         }
         if (output_service_settings) {
             obs_data_release(output_service_settings);
+        }
+        if (output_settings) {
+            obs_data_release(output_settings);
         }
         std::filesystem::current_path(currentWorkDir);
     };
@@ -145,7 +149,13 @@ void Studio::startup() {
 
         // output
         if (settings->output) {
-            output_service = obs_service_create("rtmp_common", "rtmp service", nullptr, nullptr);
+            bool is_rtmp = settings->output->server.rfind("rtmp", 0) == 0;
+            if (is_rtmp) {
+                output_service = obs_service_create("rtmp_common", "rtmp service", nullptr, nullptr);
+            } else {
+                output_service = obs_service_create("rtmp_custom", "custom service", nullptr, nullptr);
+            }
+
             if (!output_service) {
                 throw std::runtime_error("Failed to create output service.");
             }
@@ -156,11 +166,27 @@ void Studio::startup() {
             }
 
             obs_data_set_string(output_service_settings, "server", settings->output->server.c_str());
-            obs_data_set_string(output_service_settings, "key", settings->output->key.c_str());
+
+            if (!settings->output->key.empty()) {
+                obs_data_set_string(output_service_settings, "key", settings->output->key.c_str());
+            }
+
             obs_service_update(output_service, output_service_settings);
             obs_service_apply_encoder_settings(output_service, video_encoder_settings, audio_encoder_settings);
 
-            output = obs_output_create("rtmp_output", "RTMP output", nullptr, nullptr);
+            if (is_rtmp) {
+                output = obs_output_create("rtmp_output", "rtmp output", nullptr, nullptr);
+
+            } else {
+                output = obs_output_create("ffmpeg_mpegts_muxer", "ffmpeg mpegts muxer output", nullptr, nullptr);
+                output_settings = obs_output_get_settings(output);
+#ifdef _WIN32
+                obs_data_set_string(output_settings, "exec_path", (getObsBinPath() + "\\obs-ffmpeg-mux.exe").c_str());
+#else
+                obs_data_set_string(output_settings, "exec_path", (getObsBinPath() + "/obs-ffmpeg-mux").c_str());
+#endif
+            }
+
             if (!output) {
                 throw std::runtime_error("Failed to create output.");
             }
