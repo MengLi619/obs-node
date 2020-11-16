@@ -63,6 +63,18 @@ Napi::Value updateSource(const Napi::CallbackInfo &info) {
     return info.Env().Undefined();
 }
 
+Napi::Value addDSK(const Napi::CallbackInfo &info) {
+    std::string id = info[0].As<Napi::String>();
+    std::string position = info[1].As<Napi::String>();
+    std::string url = info[2].As<Napi::String>();
+    int left = info[3].As<Napi::Number>();
+    int top = info[4].As<Napi::Number>();
+    int width = info[5].As<Napi::Number>();
+    int height = info[6].As<Napi::Number>();
+    TRY_METHOD(studio->addDSK(id, position, url, left, top, width, height))
+    return info.Env().Undefined();
+}
+
 Napi::Value muteSource(const Napi::CallbackInfo &info) {
     std::string sceneId = info[0].As<Napi::String>();
     std::string sourceId = info[1].As<Napi::String>();
@@ -135,6 +147,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "createDisplay"), Napi::Function::New(env, createDisplay));
     exports.Set(Napi::String::New(env, "destroyDisplay"), Napi::Function::New(env, destroyDisplay));
     exports.Set(Napi::String::New(env, "moveDisplay"), Napi::Function::New(env, moveDisplay));
+    exports.Set(Napi::String::New(env, "addDSK"), Napi::Function::New(env, addDSK));
     return exports;
 }
 

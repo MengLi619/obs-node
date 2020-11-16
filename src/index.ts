@@ -22,9 +22,11 @@ obs.setObsPath(obsPath);
 
 declare namespace obs {
 
-    export type RateControl = 'CBR';
+    export type RateControl = 'CBR' | 'VBR';
 
     export type SourceType = 'Image' | 'MediaSource';
+
+    export type Position = 'top' | 'top-right' | 'right' | 'bottom-right' | 'bottom' | 'bottom-left' | 'left' | 'top-left' | 'center';
 
     export type TransitionType = 'cut_transition' | 'fade_transition' | 'swipe_transition' | 'slide_transition';
 
@@ -87,13 +89,6 @@ declare namespace obs {
         output?: OutputSettings;
     }
 
-    export interface Bounds {
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-    }
-
     export interface ObsNode {
         setObsPath(obsPath: string): void
         startup(settings: Settings): void;
@@ -108,6 +103,7 @@ declare namespace obs {
         createDisplay(name: string, parentWindow: Buffer, scaleFactor: number, sourceId: string);
         destroyDisplay(name: string);
         moveDisplay(name: string, x: number, y: number, width: number, height: number);
+        addDSK(id: string, position: Position, url: string, left: number, top: number, width: number, height: number): void;
     }
 }
 

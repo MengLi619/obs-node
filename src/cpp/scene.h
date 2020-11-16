@@ -2,6 +2,7 @@
 
 #include "settings.h"
 #include "source.h"
+#include "dsk.h"
 #include <string>
 #include <map>
 #include <obs.h>
@@ -9,12 +10,11 @@
 class Scene {
 public:
     Scene(std::string &id, Settings *settings);
+    ~Scene();
 
     std::string getId() { return id; }
 
     obs_scene_t *getObsScene() { return obs_scene; }
-
-    const std::map<std::string, Source *> &getSources() { return sources; }
 
     void addSource(std::string &sourceId, SourceType sourceType, std::string &sourceUrl);
 
@@ -24,6 +24,8 @@ public:
 
     void restartSource(std::string &sourceId);
 
+    obs_scene_t *getObsOutputScene(std::map<std::string, Dsk*> &dsks);
+
     Napi::Object getNapiScene(const Napi::Env &env);
 
 private:
@@ -32,5 +34,6 @@ private:
     std::string id;
     Settings *settings;
     obs_scene_t *obs_scene;
+    obs_scene_t *obs_output_scene;
     std::map<std::string, Source *> sources;
 };

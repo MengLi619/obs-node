@@ -1,11 +1,10 @@
 import * as obs from '../src';
-import {SourceType} from '../src';
 import * as readline from 'readline';
 
 interface Source {
     sceneId: string;
     sourceId: string;
-    sourceType: SourceType;
+    sourceType: obs.SourceType;
     sourceUrl: string;
 }
 
@@ -44,6 +43,18 @@ const settings: obs.Settings = {
     },
 };
 
+const dsks = [
+    {
+        id: "dsk1",
+        position: "top-left",
+        url: "https://bjcbt-test.oss-cn-beijing.aliyuncs.com/demo-show/logo.png",
+        left: 100,
+        top: 100,
+        width: 256,
+        height: 256,
+    }
+];
+
 const sources: Source[] = [
     {
         sceneId: 'scene1',
@@ -63,6 +74,9 @@ obs.startup(settings);
 sources.forEach(s => {
     obs.addScene(s.sceneId);
     obs.addSource(s.sceneId, s.sourceId, s.sourceType, s.sourceUrl);
+});
+dsks.forEach(dsk => {
+   obs.addDSK(dsk.id, dsk.position as obs.Position, dsk.url, dsk.left, dsk.top, dsk.width, dsk.height);
 });
 
 console.log(`Obs scenes: ${JSON.stringify(obs.getScenes())}`);

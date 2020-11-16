@@ -45,8 +45,8 @@ void Source::start() {
         if (settings->videoDecoder) {
             obs_data_set_bool(obs_data, "hw_decode", settings->videoDecoder->hardwareEnable);
         }
-        obs_data_set_bool(obs_data, "close_when_inactive", false);
-        obs_data_set_bool(obs_data, "restart_on_activate", false);
+        obs_data_set_bool(obs_data, "close_when_inactive", false);  // make source always read
+        obs_data_set_bool(obs_data, "restart_on_activate", false);  // make source always read
         obs_source = obs_source_create("ffmpeg_source", this->id.c_str(), obs_data, nullptr);
     }
 
