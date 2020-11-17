@@ -47,7 +47,7 @@ const dsks = [
     {
         id: "dsk1",
         position: "top-left",
-        url: "https://bjcbt-test.oss-cn-beijing.aliyuncs.com/demo-show/logo.png",
+        url: "https://httpbin.org/image/png",
         left: 100,
         top: 100,
         width: 256,
